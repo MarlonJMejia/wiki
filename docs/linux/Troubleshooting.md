@@ -1,6 +1,6 @@
 # General Commands
 
-## vmstat
+### vmstat
 
 > Report information about processes, memory, paging, block IO, traps, disks and CPU activity.
 > More information: <https://manned.org/vmstat>.
@@ -18,7 +18,7 @@
     vmstat 2 5
     ```
 
-## mpstat
+### mpstat
 
 > Report CPU statistics.
 > More information: <https://manned.org/mpstat>.
@@ -42,12 +42,12 @@
     mpstat -P 0 2 5
     ```
 
-## pidstat
+### pidstat
 
 > Show system resource usage, including CPU, memory, IO etc.
 > More information: <https://manned.org/pidstat>.
 
-???+ example
+??? example
     - Show CPU statistics at a 2 second interval for 10 times:
 
     ```bash
@@ -78,12 +78,12 @@
     pidstat -C "fox|bird" -r -p ALL
     ```
 
-## iostat
+### iostat
 
 > Report statistics for devices and partitions.
 > More information: <https://manned.org/iostat>.
 
-???+ example
+??? example
     - Display a report of CPU and disk statistics since system startup:
 
     ```bash
@@ -120,14 +120,14 @@
     iostat 2
     ```
 
-# Networking
+## Networking
 
-## sar
+### sar
 
 > Monitor performance of various Linux subsystems.
 > More information: <https://manned.org/sar>.
 
-???+ example
+??? example
     - Report I/O and transfer rate issued to physical devices, one per second (press CTRL+C to quit):
 
     ```bash
@@ -164,12 +164,12 @@
     sar -B {{5}}
     ```
 
-## ss
+### ss
 
 > Utility to investigate sockets.
 > More information: <https://manned.org/ss.8>.
 
-???+ example
+??? example
     - Show all TCP/UDP/RAW/UNIX sockets:
 
     ```bash
@@ -218,12 +218,12 @@
     ss --kill dst 192.168.1.17 dport = 8080
     ```
 
-## tcpdump
+### tcpdump
 
 > Dump traffic on a network.
 > More information: <https://www.tcpdump.org>.
 > 
-???+ example
+??? example
     - List available network interfaces:
 
     ```bash
@@ -270,4 +270,74 @@
 
     ```bash
     tcpdump -r dumpfile.pcap
+    ```
+
+## Systemd and Kernel
+
+### dmesg
+
+> Write the kernel messages to `stdout`. More information: <https://manned.org/dmesg>.
+
+???+ example
+
+    - Show kernel error messages:
+
+    ```bash
+    dmesg --level err
+    ```
+
+    - Show kernel messages and keep reading new ones, similar to `tail -f` (available in kernels 3.5.0 and newer):
+
+    ```bash
+    dmesg -w
+    ```
+
+    - Show how much physical memory is available on this system:
+
+    ```bash
+    dmesg | grep -i memory
+    ```
+
+    - Show kernel messages with a timestamp(-T), human-readable(-H) and colorized(-L) output (available in kernels 3.5.0 and newer):
+
+    ```bash
+    dmesg -THL
+    ```
+
+### systemd-analyze
+
+> Analyze and debug system manager.
+> Show timing details about the boot process of units (services, mount points, devices, sockets).
+> More information: <https://www.freedesktop.org/software/systemd/man/systemd-analyze.html>.
+??? example
+
+    - List all running units, ordered by the time they took to initialize:
+
+    ```bash
+    systemd-analyze blame
+    ```
+
+    - Print a tree of the time-critical chain of units:
+
+    ```bash
+    systemd-analyze critical-chain
+    systemd-analyze critical-chain ssh.service
+    ```
+
+    - Create an SVG file showing when each system service started, highlighting the time that they spent on initialization:
+
+    ```bash
+    systemd-analyze plot > path/to/file.svg
+    ```
+
+    - Plot a dependency graph and convert it to an SVG file:
+
+    ```bash
+    systemd-analyze dot | dot -T svg > path/to/file.svg
+    ```
+
+    - Show security scores of running units:
+
+    ```bash
+    systemd-analyze security
     ```
