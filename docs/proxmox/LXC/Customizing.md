@@ -10,7 +10,7 @@ dateCreated: 2024-06-10T01:35:16.695Z
 
 # Creating and Customizing a Template
 
-1. Upgrade or Installl any applications on the template. Ref: *[Downloading a LXC Template](/home/LXC)*
+1. Upgrade or Installl any applications on the template. Ref: *[Downloading a LXC Template](Downloading.md)*
 
     ```shell
     pct enter <lxcid>

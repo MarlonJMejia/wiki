@@ -1,5 +1,5 @@
 site_name: Documentation and Notes
-repo_url: https://github.com/squidfunk/mkdocs-material
+  #repo_url: https://github.com/squidfunk/mkdocs-material
 
 markdown_extensions:
   - toc:
@@ -14,7 +14,7 @@ markdown_extensions:
   - pymdownx.snippets
   - pymdownx.superfences
   - pymdownx.details
-  - admonition  
+  - admonition
   - abbr
   - attr_list
 
