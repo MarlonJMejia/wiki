@@ -1,5 +1,10 @@
 # General Commands
 
+What type of system? 
+
+    `dmidecode -s system-manufacturer`
+    `systemd-detect-virt`
+
 ### vmstat
 
 > Report information about processes, memory, paging, block IO, traps, disks and CPU activity.
