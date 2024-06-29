@@ -17,6 +17,11 @@ markdown_extensions:
   - admonition
   - abbr
   - attr_list
+  - meta
+
+plugins:
+  - git-revision-date-localized:
+      enable_creation_date: true
 
 theme:
   font: 

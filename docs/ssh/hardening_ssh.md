@@ -7,6 +7,7 @@
   - [Generating an SSH Key](#generating-an-ssh-key)
     - [Authorizing The User](#authorizing-the-user)
     - [Change Authentication Method of SSH](#change-authentication-method-of-ssh)
+- [Testing](#testing)
 
 ## Overview
 
@@ -91,3 +92,12 @@ Now we need to go to the server's SSH configuration file, and change a few thing
 
 Now your server will only accept SSH connections from clients that have their
 public keys in the `.ssh/authorized_keys` file.
+
+
+# Testing
+
+Verify users can only log in via public authentication
+
+```
+ ssh -o PubkeyAuthentication=no -o PreferredAuthentications=password proxmox.inside.la
+ ```

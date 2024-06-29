@@ -12,3 +12,13 @@
     ```bash
     grep $(date +%F) /var/log/apt/history.log
     ```
+
+???+ example "Backing up"
+
+    - Backing up a root drive
+
+    ```bash
+    sudo rsync -aAXHv --stats --exclude={"/dev/*","/swapfile","/raid/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/media/*","/lost+found"} / /raid/backups/root-backup-$(date '+%m-%d-%Y')
+    ```
+
+    

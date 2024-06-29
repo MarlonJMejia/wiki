@@ -6,6 +6,20 @@
     ansible all -m ansible.builtin.gather_facts --tree /tmp/facts
     ```
 
+    ```bash
+    ansible -m setup -a 'filter=ansible_distribution'
+    ```
+
+### One line modifications with ad-hoc commands
+
+???+ example
+
+    ```bash
+    # Replace a line from a file with sed
+    
+    ansible -m shell -a "sed -i 's/var1=.*/var1=111111/' /opt/deployment/configfile.cfg" -i /root/hosts servers
+    ```
+
 ### Ansible Galaxy
 
 > Create and manage Ansible roles.
