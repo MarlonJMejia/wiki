@@ -5,6 +5,12 @@ What type of system?
     `dmidecode -s system-manufacturer`
     `systemd-detect-virt`
 
+Biggest file?
+
+`du -mxS / |sort -n|tail -10`
+`dua i`
+`ncdu`
+
 ### vmstat
 
 > Report information about processes, memory, paging, block IO, traps, disks and CPU activity.
