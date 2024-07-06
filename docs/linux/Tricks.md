@@ -20,5 +20,3 @@
     ```bash
     sudo rsync -aAXHv --stats --exclude={"/dev/*","/swapfile","/raid/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/media/*","/lost+found"} / /raid/backups/root-backup-$(date '+%m-%d-%Y')
     ```
-
-    

@@ -2,14 +2,26 @@
 
 What type of system? 
 
-    `dmidecode -s system-manufacturer`
-    `systemd-detect-virt`
+```bash
+dmidecode -s system-manufacturer
+systemd-detect-virt
+```
 
 Biggest file?
 
-`du -mxS / |sort -n|tail -10`
-`dua i`
-`ncdu`
+```bash
+du -mxS / |sort -n|tail -10
+dua i
+ncdu
+```
+
+Does the system needs to restarted?
+
+```bash
+cat /var/run/reboot-required /run/reboot-required
+cat /var/run/reboot-required.pkgs /run/reboot-required.pkgs
+needrestart
+```
 
 ### vmstat
 
@@ -28,6 +40,8 @@ Biggest file?
     ```bash
     vmstat 2 5
     ```
+
+# CPU & PROCESSES
 
 ### mpstat
 
@@ -131,7 +145,7 @@ Biggest file?
     iostat 2
     ```
 
-## Networking
+# Networking
 
 ### sar
 
@@ -283,7 +297,7 @@ Biggest file?
     tcpdump -r dumpfile.pcap
     ```
 
-## Systemd and Kernel
+# Systemd and Kernel
 
 ### dmesg
 
