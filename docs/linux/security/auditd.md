@@ -1,24 +1,26 @@
 # Installing auditd
 
-Install audit `sudo dnf install audit`
+Install audit
 
-Enable and start auditd `systemctl enable --now auditd`
+    sudo dnf install audit
 
-### Configuration
+Enable and start auditd 
 
-- [Premade configuration with best practices](Premade configuration with best practices https://github.com/Neo23x0/auditd)
+    systemctl enable --now auditd
 
-- Download the rule: `wget https://raw.githubusercontent.com/Neo23x0/auditd/master/audit.rules`
+[Premade configuration with best practices](https://github.com/Neo23x0/auditd)
 
-- Directory for custom rules: `/etc/audit/rules.d`
-
+```bash title="Download"
+curl -L https://raw.githubusercontent.com/Neo23x0/auditd/master/audit.rules \
+-o /etc/audit/rules.d/audit_git.rules
+```
 # auditctl
 
 > Utility to control the behavior, get status and manage rules of the Linux Auditing System.
 
 > More information: <https://manned.org/auditctl>.
 
-???+ example
+??? example
 
     - Display the [s]tatus of the audit system:
 

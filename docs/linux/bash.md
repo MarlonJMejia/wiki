@@ -6,6 +6,8 @@ editor: markdown
 dateCreated: 2024-07-05T21:12:23
 ---
 
+# Scripting
+
 [Unofficial Strict Mode](http://redsymbol.net/articles/unofficial-bash-strict-mode/)
 
 ??? info
@@ -13,7 +15,7 @@ dateCreated: 2024-07-05T21:12:23
 
     There is a short-term downside: these settings make certain common bash idioms harder to work with. Most have simple workarounds.
 
-```bash
+```bash title='header'
 #!/bin/bash
 set -euo pipefail
 IFS=$'\n\t'

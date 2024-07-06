@@ -1,0 +1,40 @@
+name: Gitleaks Pre-Commit Check
+
+on:
+  push:
+    branches: [ "main", "dev", "release/*" ]
+  pull_request:
+    branches: [ "main", "dev", "release/*" ]
+
+jobs:
+  gitleaks-scan:
+    name: Run Gitleaks Scan
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Install Gitleaks
+      run: |
+        # Download the latest Gitleaks release binary for Linux
+        wget https://github.com/gitleaks/gitleaks/releases/download/v8.17.0/gitleaks_8.17.0_linux_x64.tar.gz
+        
+        # Extract the binary
+        tar -xvzf gitleaks_8.17.0_linux_x64.tar.gz
+        
+        # Move the binary to a directory that's in the PATH
+        sudo mv gitleaks /usr/local/bin/
+
+    - name: Run Gitleaks
+      run: |
+        gitleaks detect -v --exit-code 1
+
+    - name: Check for Leaks
+      run: |
+        if gitleaks detect -v --exit-code 1; then
+          echo "No secrets detected."
+        else
+          echo "Secrets detected! Please address the issues and try again."
+          exit 1
+        fi
