@@ -51,6 +51,7 @@ qm set 8000 --cipassword hidden
 ```
 
 Create the template
+
 ```bash
 qm template 8000
 ```
