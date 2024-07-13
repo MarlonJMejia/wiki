@@ -26,6 +26,7 @@ plugins:
 theme:
   font: 
     text: DM Sans
+    code: DM Mono
   name: material
   features:
     - content.code.copy

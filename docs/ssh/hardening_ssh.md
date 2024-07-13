@@ -7,7 +7,7 @@
   - [Generating an SSH Key](#generating-an-ssh-key)
     - [Authorizing The User](#authorizing-the-user)
     - [Change Authentication Method of SSH](#change-authentication-method-of-ssh)
-- [Testing](#testing)
+- [Verification](#verification)
 
 ## Overview
 
@@ -46,7 +46,7 @@ On the Server, add the contents of the public key file to `~/.ssh/authorized_key
 
 To  add a public_key to all users, you can predefined a directory, with a key for the users of your system.
 
-```
+```bash
 AuthorizedKeysFile  .ssh/authorized_keys /etc/ssh/authorized_keys
 ```
 
@@ -55,6 +55,7 @@ AuthorizedKeysFile  .ssh/authorized_keys /etc/ssh/authorized_keys
 Now we need to go to the server's SSH configuration file, and change a few things.
 
 1. Open `/etc/ssh/sshd_config` as root (`sudo`):
+
     ```bash
     sudo vi /etc/ssh/sshd_config
     ```
@@ -94,10 +95,16 @@ Now your server will only accept SSH connections from clients that have their
 public keys in the `.ssh/authorized_keys` file.
 
 
-# Testing
+# Verification
 
-Verify users can only log in via public authentication
+Verify users can only log in via public key authentication only
 
+```bash
+ssh -o PubkeyAuthentication=no -o PreferredAuthentications=password proxmox.inside.lan
 ```
- ssh -o PubkeyAuthentication=no -o PreferredAuthentications=password proxmox.inside.la
- ```
+
+Verify sshd configuration
+
+```bash
+sshd -t -f $file
+```
