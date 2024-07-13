@@ -1,14 +1,5 @@
 # Hardening SSH with Authorized Keys
 
-## Table of Contents
-- [Hardening SSH with Authorized Keys](#hardening-ssh-with-authorized-keys)
-  - [Table of Contents](#table-of-contents)
-  - [Overview](#overview)
-  - [Generating an SSH Key](#generating-an-ssh-key)
-    - [Authorizing The User](#authorizing-the-user)
-    - [Server Configuration options](#server-configuration-options)
-- [Verification](#verification)
-
 ## Overview
 
 I found multiple attempts to login to my server via SSH.  
@@ -65,10 +56,12 @@ AllowUsers illegal
 ```
 Deny authentication methods:
 
+```config
 PermitRootLogin [no, prohibit-password]
 PubkeyAuthentication [yes, no]
 PasswordAuthentication [yes, no]
 AuthenticationMethods [pubkey, password, etc...]
+```
 
 # Verification
 
