@@ -28,7 +28,7 @@ virt-customize -a AlmaLinux-9-GenericCloud-9.3-20231113.x86_64.qcow2 --install q
 Virtual machine configuration and creation
 
 ???+ info
-    `--tablet=0` Disable pointer graphics which decreases CPU consumption
+    `--tablet=0` Disable pointer graphics to decreases CPU consumption
 
 ```bash
 qm create 8000 --name almalinux-9-3-init --ostype l26 --tablet 0
