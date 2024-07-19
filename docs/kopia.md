@@ -143,6 +143,15 @@ NOTE: To validate that your provider is compatible with Kopia, please run:
 $ kopia repository validate-provider
 ```
 
+```bash title="Disconnecting from your repository"
+kopia repository disconnect
+```
+
+```bash title=""Connecting to your repository"
+kopia repository connect filesystem --path /.kopia_backups/
+```
+
+
 ## Your initinal snapshot and incremental snapshots
 
 Creating a snapshot is as simple as a `kopia snapshot create`:
@@ -183,7 +192,7 @@ root@rockytest:/root
 Viewing the contents of the snapshot with `kopia list`:
 
 ```bash
-kopia list  k2e8cc246eeeef5d3f051e67fa513c7b0 -r -l
+kopia list k2e8cc246eeeef5d3f051e67fa513c7b0 -r -l
 ```
 
 ```bash title=output
