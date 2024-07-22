@@ -14,7 +14,7 @@ theme:
     - search.share
     - content.tabs.link
     - content.tooltips
-      
+
   palette:
     # Palette toggle for automatic mode
     - media: "(prefers-color-scheme)"
