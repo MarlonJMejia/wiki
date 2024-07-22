@@ -1,3 +1,50 @@
+# List Timers
+
+```bash
+systemctl list-timers
+```
+
+# Unit Files
+
+```bash title="kopia_backup.service"
+[Unit]
+Description=kopia backup
+Wants=network-online.target
+After=network-online.target
+ConditionACPower=true
+# OnFailure=ntfy@failure-%p.service
+# OnSuccess=ntfy@success-%p.service
+
+[Service]
+Type=oneshot
+
+# Lower CPU and I/O priority.
+Nice=19
+CPUSchedulingPolicy=batch
+IOSchedulingPriority=7
+
+IPAccounting=true
+PrivateTmp=true
+Environment="HOME=/root" # Environment Variables
+
+ExecStart=yourscript # Script to execute or command
+```
+
+```bash title="kopia_backup.timer"
+    [Unit]
+    Description=Kopia Backup
+
+    [Timer]
+    OnCalendar=*-*-* 02:00:00
+    RandomizedDelaySec=10min
+    Persistent=true
+
+    [Install]
+    WantedBy=timers.target
+```
+
+# OnCalendar Examples
+
 | Explanation                  | Systemd Timer             |
 |------------------------------|---------------------------|
 | Every Minute                 | `*-*-* *:*:00`            |
