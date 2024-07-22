@@ -1,12 +1,18 @@
 # Generating an SSH Key
 
-If you don't already have an SSH key, you'll need to generate one.  
+??? note "Explanation"
+    Public Key - Accessible to everyone, shared with everyone, used on the server(s).
 
-On the client, generate an SSH key with:
+    Private Key - Must be kept secret, not shared with everyone, used by the client.
+
+    A Public Key is the Door Knob
+
+    A Private Key is the Key for the Door Knob
+
+Generate an SSH key with:
 ```bash
 ssh-keygen -C mycomment -f /tmp/somekey -t ed25519
 ```
-* Optionally you can add a comment to the key with `-C "comment"`.  
 
 Next, grab the public key (NOT THE PRIVATE KEY!) from `~/.ssh/id_ed25519.pub`.
 Public keys will always end with `.pub`.
