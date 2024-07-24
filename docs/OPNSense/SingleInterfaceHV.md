@@ -41,7 +41,7 @@ ifreload -a
 
 # Add the new bridge port to OPNSense
 
-First we need to view the configurationf or the VM 
+First we need to view the configurationf or the VM
 
 ```bash
 qm config 100 | grep -i net

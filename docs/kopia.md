@@ -195,7 +195,7 @@ Viewing the contents of the snapshot with `kopia list`:
 kopia list k2e8cc246eeeef5d3f051e67fa513c7b0 -r -l
 ```
 
-```bash title=output
+```bash title="output"
 drwxr-xr-x            0 2024-07-15 19:11:57 EDT kf652ba8cf935331461506477ecd8bf3a  folder/2/
 ```
 
