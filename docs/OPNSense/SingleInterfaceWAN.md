@@ -19,7 +19,10 @@ iface enp1s0.5 inet manual
 
 Create a bridge for your `enp1s0.5` interface:
 
-```bash title="/etc/network/interfaces.d/hacky
+```bash title="/etc/network/interfaces.d/hacky"
+auto enp1s0.5
+iface enp1s0.5 inet manual
+
 auto vmbr2
 iface vmbr2 inet static
         address 10.0.200.10/24
