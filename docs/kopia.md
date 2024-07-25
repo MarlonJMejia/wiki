@@ -308,3 +308,14 @@ Understanding backup rentetion policies
   --keep-monthly=N           Number of most-recent monthly backups to keep per source (or 'inherit')
   --keep-annual=N            Number of most-recent annual backups to keep per source (or 'inherit')
 ```
+
+
+WIP
+
+```bash title="Delete everything from a user"
+kopia snapshot delete --all-snapshots-for-source illegal@legal --delete
+```
+
+```view modification time
+kopia snapshot -mtime
+```

@@ -37,6 +37,8 @@ theme:
         name: Switch to system preference
 
 markdown_extensions:
+  - pymdownx.tabbed:
+      alternate_style: true
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
