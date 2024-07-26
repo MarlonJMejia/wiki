@@ -1,11 +1,11 @@
 ---
 title: Backup of Directories - Kopia
 author: Marlon Mejia
-contributors: Mejia
+contributors: Marlon Mejia, 
 tested_with: 9.3
 tags:
   - backup
-  - rsnapshot
+  - kopia
 ---
 
 # Snapshots of Directories - _kopia_
@@ -143,15 +143,6 @@ NOTE: To validate that your provider is compatible with Kopia, please run:
 $ kopia repository validate-provider
 ```
 
-```bash title="Disconnecting from your repository"
-kopia repository disconnect
-```
-
-```bash title=""Connecting to your repository"
-kopia repository connect filesystem --path /.kopia_backups/
-```
-
-
 ## Your initinal snapshot and incremental snapshots
 
 Creating a snapshot is as simple as a `kopia snapshot create`:
@@ -192,10 +183,10 @@ root@rockytest:/root
 Viewing the contents of the snapshot with `kopia list`:
 
 ```bash
-kopia list k2e8cc246eeeef5d3f051e67fa513c7b0 -r -l
+kopia list  k2e8cc246eeeef5d3f051e67fa513c7b0 -r -l
 ```
 
-```bash title="output"
+```bash title=output
 drwxr-xr-x            0 2024-07-15 19:11:57 EDT kf652ba8cf935331461506477ecd8bf3a  folder/2/
 ```
 
@@ -207,6 +198,83 @@ kopia list kf652ba8cf935331461506477ecd8bf3a -l
 
 ```bash title="Json Format"
 kopia content show  kf652ba8cf935331461506477ecd8bf3a -j
+```
+
+## Restoring from backup
+
+You can use `kopia mount` or `kopia restore` to restore from backup, additionally you'll also be able to restore specific selected files.
+
+### Kopia Restore
+
+First we'll carefully delete the contents of the directory we want to backup.
+
+???+ warning
+  Yes, this will delete your files, this is a loss in data.
+  **BE CAREFUL**
+
+```bash title="Remove everything inside the directory /root/"
+rm -rf /root/*
+ls /root/
+```
+
+```bash
+kopia restore root@rockytest:/root --snapshot-time latest
+```
+
+```bash
+[root@rockytest ~]# kopia restore root@rockytest:/root --snapshot-time latest                                                             Restoring to local filesystem (/root) with parallelism=8...                                                                               Restoring from                                                                                                                               Snapshot source: root@rockytest:/root                                                                                                     Snapshot time: 2024-07-26 22:17:17 UTC                                                                                                    Relative path:                                                                                                                            Object ID: kcbee2a8626688104bcdc4cfcb95fa123                                                                                           Processed 1326 (1 GB) of 2635 (1.2 GB) 1 GB/s (82.1%) remaining 0s.                                                                       Processed 1872 (1.1 GB) of 2635 (1.2 GB) 543.9 MB/s (89.3%) remaining 0s.                                                                 Processed 2250 (1.2 GB) of 2635 (1.2 GB) 383.1 MB/s (94.6%) remaining 0s.                                                                 Processed 2571 (1.2 GB) of 2635 (1.2 GB) 298 MB/s (98.6%) remaining 0s.                                                                   Processed 2636 (1.2 GB) of 2635 (1.2 GB) 208.2 MB/s (100.0%) remaining 0s.                                                                Processed 2636 (1.2 GB) of 2635 (1.2 GB) 87.4 MB/s (100.0%) remaining 0s.                                                                 Processed 2636 (1.2 GB) of 2635 (1.2 GB) 87.4 MB/s (100.0%) remaining 0s.                                                                 Restored 2454 files, 180 directories and 2 symbolic links (1.2 GB).
+```
+
+```bash title="Verify your backup are in place"
+ls /root/
+```
+
+### Mounting a backup
+
+Kopia supports mounting a filesystem it uses [FUSE](https://www.kernel.org/doc/html/latest/filesystems/fuse.html) as the backend.
+
+By default `kopia mount` will mount all your snapshots from your current repository, it will also create a direcotry under `/tmp/kopia-mount{randomdigits}`.
+
+The following command will create a directory for Kopia to mount to, and mount all snapshots on that directory. It will also move the backup process to the background with `&`.
+
+`all` is a special keyword to select all snapshots from the repository.
+
+```bash title="Mounting all your snapshots to /tmp/kopia-mount"
+mkdir /tmp/kopia-mount
+kopia mount all /tmp/kopia-mount &
+```
+
+```bash title="Viewing snapshots under your mountpoint"
+[root@rockytest ~]# ls -lt /tmp/kopia-mount/root@rockytest/root/
+total 0
+dr-xr-xr-x. 1 root root 0 Jul 26 22:17 20240726-221717
+dr-xr-xr-x. 1 root root 0 Jul 26 22:17 20240726-221700
+dr-xr-xr-x. 1 root root 0 Jul 26 22:16 20240726-221658
+dr-xr-xr-x. 1 root root 0 Jul 26 22:16 20240726-221656
+dr-xr-xr-x. 1 root root 0 Jul 26 22:16 20240726-221655
+dr-xr-xr-x. 1 root root 0 Jul 26 22:16 20240726-221653
+dr-xr-xr-x. 1 root root 0 Jul 26 22:16 20240726-221651
+dr-xr-xr-x. 1 root root 0 Jul 26 22:16 20240726-221650
+dr-xr-xr-x. 1 root root 0 Jul 26 22:16 20240726-221648
+dr-xr-xr-x. 1 root root 0 Jul 26 22:16 20240726-221647
+dr-xr-xr-x. 1 root root 0 Jul 19 08:28 20240719-082847
+```
+
+Restoring from a snapshot on the mountpoint:
+
+```bash
+rm -rf /root/*
+command cp -avT  /tmp/kopia-mount/root@rockytest/root/20240726-221717/ /root/
+```
+
+```bash title="Verify your backup are in place"
+ls /root/
+```
+
+Unmount your repostitory by issuing the `fg` command and afterwards using ++ctrl+c++:
+
+```bash
+fg
 ```
 
 ## Configuring your repository policy
@@ -223,9 +291,9 @@ Policy settings can be applied to the following targets:
 | local path | /.kopia_backups |
 | --global | global configuration |
 
-```bash
-[root@rockytest ~]# kopia policy show /.kopia_backups
-Policy for root@rockytest:/.kopia_backups:
+```bash title="View policy for the root@rockytest"
+[root@rockytest ~]# kopia policy show root@rockytest
+Policy for root@rockytest:
 
 Retention:
   Annual snapshots:                     3   inherited from (global)
@@ -278,37 +346,302 @@ Applying a compression setting to a repository via a policy
 
 ??? note
 
-    To view a list of compression algorithms please see https://kopia.io/docs/advanced/compression/
+  To view a list of compression algorithms please see https://kopia.io/docs/advanced/compression/
 
 ```bash
-[root@rockytest ~]# kopia policy set --compression zstd /.kopia_backups
-Setting policy for root@rockytest:/.kopia_backups
- - setting compression algorithm to zstd
+kopia policy set --compression zstd root@rockytest
 ```
 
-```bash title="output"
-[root@rockytest ~]# kopia policy show /.kopia_backups | grep -i Compres
+```bash title="Confirmation"
+[root@rockytest ~]# kopia policy show root@rockytest | grep -i Compres
 Compression:
   Compressor:                        zstd   (defined for this target)
   Compress files regardless of extensions.
   Compress files of all sizes.
 ```
 
-```bash title="Remove specific file extensions from compression"
-# Disable .7z .7Z and .gz .Gz .GZ file extensions
-kopia policy set --add-never-compress=.tar.* --add-never-compress=.7[zZ] --add-never-compress=.[gG][zZ] /.kopia_backups
+Ignoring files and directories
+
+```bash
+kopia policy set --add-ignore public/ --add-ignore node_modules/ root@rockytest
+```
+
+```bash title="output"
+[root@rockytest ~]# kopia policy set --add-ignore "public/" --add-ignore "node_modules/" root@rockytest
+Setting policy for root@rockytest:root@rockytest
+ - adding "public/" to "ignore rules"
+ - adding "node_modules/" to "ignore rules".
+```
+
+```bash title="Ignore policy for specific extensions"
+kopia policy set --add-ignore=*.7[zZ] --add-ignore=*.[gG][zZ] root@rockytest
 ```
 
 ### Retention
 
-Understanding backup rentetion policies
+???+ note
 
-```bash
+  Testing was mainly done with the following bash shell script.
+  
+  ```bash
+  for i in {1..10}; do kopia snapshot create $HOME && sleep 1; head -n1 /dev/random > $((i++)); done
+  ```
+
+```bash title="Retention pollicies"
   --keep-latest=N            Number of most recent backups to keep per source (or 'inherit')                                                --keep-hourly=N            Number of most-recent hourly backups to keep per source (or 'inherit')                                         --keep-daily=N             Number of most-recent daily backups to keep per source (or 'inherit')                                          --keep-weekly=N            Number of most-recent weekly backups to keep per source (or 'inherit')
   --keep-monthly=N           Number of most-recent monthly backups to keep per source (or 'inherit')
   --keep-annual=N            Number of most-recent annual backups to keep per source (or 'inherit')
 ```
 
+Let's start simple, we want to keep the last 10 snapshots of our backup as opposed to the inherited default from the global policy of 42.
+
+```bash
+kopia policy set --keep-latest=10 root@rockytest
+```
+
+In this case, _rsnapshot_ will run locally to back up a particular machine. In this example, we will break down the configuration file, and show you exactly what you need to change.
+
+You will need to use `vi` (or edit with your favorite editor) to open the _/etc/rsnapshot.conf_ file.
+
+The first thing to change is the _snapshot_root_ setting. The default has this value:
+
+`snapshot_root   /.snapshots/`
+
+You need to change this to your mount point that we created above plus the addition of "storage".
+
+`snapshot_root   /mnt/backup/storage/`
+
+You also want to tell the backup not to run if the drive is not mounted. To do this, remove the "#" sign (also called a remark, number sign, hash symbol, and so on.) next to `no_create_root` which looks this way:
+
+`no_create_root 1`
+
+Next go down to the section titled `# EXTERNAL PROGRAM DEPENDENCIES #` and remove the comment (again, the "#" sign) from this line:
+
+`#cmd_cp         /usr/bin/cp`
+
+It now reads:
+
+`cmd_cp         /usr/bin/cp`
+
+While you do not need `cmd_ssh` for this particular configuration, you will need it for our other option and it does not hurt to have it enabled. Find the line that says:
+
+`#cmd_ssh        /usr/bin/ssh`
+
+Remove the "#" sign:
+
+`cmd_ssh        /usr/bin/ssh`
+
+Next you need to skip down to the section titled `#     BACKUP LEVELS / INTERVALS         #`
+
+Earlier versions of _rsnapshot_ had `hourly, daily, monthly, yearly` but are now `alpha, beta, gamma, delta`. It is a bit confusing. What you need to do is add a remark to any interval that you will not use. In the configuration, delta is already remarked out.
+
+In this example, you are not going to be running any other increments other than a nightly backup. Just add a remark to alpha and gamma. When completed, your configuration file will be:
+
+```text
+#retain  alpha   6
+retain  beta    7
+#retain  gamma   4
+#retain delta   3
+```
+
+Skip down to the `logfile` line, which by default is:
+
+`#logfile        /var/log/rsnapshot`
+
+Remove the remark:
+
+`logfile        /var/log/rsnapshot`
+
+Finally, skip down to the `### BACKUP POINTS / SCRIPTS ###` section and add any directories that you want to add in the `# rockytest` section, remember to use ++tab++ rather than ++space++ between elements!
+
+For now write your changes (`SHIFT :wq!` for `vi`) and exit the configuration file.
+
+### Checking the configuration
+
+You want to ensure that you did not add spaces or any other glaring errors to our configuration file while you were editing it. To do this, you run _rsnapshot_ against our configuration with the `configtest` option:
+
+`rsnapshot configtest` will show `Syntax OK` if no errors exist.
+
+You should get into the habit of running `configtest` against a particular configuration. The reason for that will be more evident when you get into the **Multiple Machine or Multiple Server Backups** section.
+
+To run `configtest` against a particular configuration file, run it with the -c option to specify the configuration:
+
+`rsnapshot -c /etc/rsnapshot.conf configtest`
+
+## Running the backup the first time
+
+With `configtest` verifying everything is OK, it is now time to run the backup for the first time. You can run this in test mode first if you like, so that you can see what the backup script is going to do.
+
+Again, to do this you do not necessarily have to specify the configuration in this case, but it is a good idea to get into the habit of doing so:
+
+`rsnapshot -c /etc/rsnapshot.conf -t beta`
+
+Which will return something similar to this, showing you what will happen when the backup is actually run:
+
+```bash
+echo 1441 > /var/run/rsnapshot.pid
+mkdir -m 0755 -p /mnt/backup/storage/beta.0/
+/usr/bin/rsync -a --delete --numeric-ids --relative --delete-excluded \
+    /home/ /mnt/backup/storage/beta.0/rockytest/
+mkdir -m 0755 -p /mnt/backup/storage/beta.0/
+/usr/bin/rsync -a --delete --numeric-ids --relative --delete-excluded /etc/ \
+    /mnt/backup/storage/beta.0/rockytest/
+mkdir -m 0755 -p /mnt/backup/storage/beta.0/
+/usr/bin/rsync -a --delete --numeric-ids --relative --delete-excluded \
+    /usr/local/ /mnt/backup/storage/beta.0/rockytest/
+touch /mnt/backup/storage/beta.0/
+```
+
+When the test meets your expectations, run it manually the first time without the test:
+
+`rsnapshot -c /etc/rsnapshot.conf beta`
+
+When the backup finishes, browse to /mnt/backup and examine the directory structure that it creates there. There will be a `storage/beta.0/rockytest` directory, followed by the directories that you specified to backup.
+
+### Further explanation
+
+Each time the backup runs, it will create another beta increment, 0-6, or 7 days worth of backups. The newest backup will always be beta.0 whereas yesterday's backup will always be beta.1.
+
+The size of each of these backups will appear to take up the same amount (or more) of disk space, but this is because of _rsnapshot's_ use of hard links. To restore files from yesterday's backup, you just copy them back from beta.1's directory structure.
+
+Each backup is only an incremental backup from the previous run, BUT, because of the use of hard links, each backup directory, contains either the file or the hard-link to the file in whichever directory it was actually backed up in.
+
+To restore files, you do not have to decide the directory or increment to restore them from, just what time stamp of the backup that you are restoring. It is a great system and uses far less disk space than many other backup solutions.
+
+## Setting the backup to run automatically
+
+With testing completed and secure in the knowledge that things will work without issue, the next step is to set up the crontab for the root user to automate the process every day:
+
+`sudo crontab -e`
+
+If you have not run this before, choose vim.basic as your editor or your own editor preference when the `Select an editor` line comes up.
+
+You are going to set your backup to automatically run at 11 PM, so you will add this to the crontab:
+
+```bash
+## Running the backup at 11 PM
+00 23 *  *  *  /usr/bin/rsnapshot -c /etc/rsnapshot.conf beta`
+```
+
+## Multiple machine or multiple server backups
+
+Doing backups of multiple machines from a machine with a RAID array or large storage capacity, on-premise or from on an Internet connection elsewhere works well.
+
+If running these backups over the Internet, you need to ensure that each location has adequate bandwidth for the backups to occur. You can use _rsnapshot_ to synchronize an on-site server with an off-site backup array or backup server to improve data redundancy.
+
+## Assumptions
+
+Running _rsnapshot_ from a machine remotely, on-premise. Running this exact configuration is possible remotely off-premise also.
+
+In this case, you will want to install _rsnapshot_ on the machine that is doing all of the backups. Other assumptions are:
+
+- That the servers you will be backing up to, have a firewall rule that allows the remote machine to SSH into it
+- That each server that you will be backing up has a recent version of `rsync` installed. For Rocky Linux servers, run `dnf install rsync` to update your system's version of `rsync`.
+- That you have connected to the machine as the root user, or that you have run `sudo -s` to switch to the root user
+
+## SSH public or private keys
+
+For the server that will be running the backups, you need to generate an SSH key-pair for use during the backups. For our example, you will be creating RSA keys.
+
+If you already have a set of keys generated, you can skip this step. You can find out by doing an `ls -al .ssh` and looking for an `id_rsa` and `id_rsa.pub` key pair. If none exists, use the following link to set up keys for your machine and the server(s) that you want to access:
+
+[SSH Public Private Key Pairs](../security/ssh_public_private_keys.md)
+
+## _rsnapshot_ configuration
+
+The configuration file needs to be nearly the same as the one we created for the **Basic Machine or Single Server Backup** , except that you need to change some of the options.
+
+The snapshot root is the default:
+
+`snapshot_root   /.snapshots/`
+
+Comment this line out:
+
+`no_create_root 1`
+
+`#no_create_root 1`
+
+The other difference here is that each machine will have its own configuration. When you get used to this, you will just copy one of your existing configuration files over to a different name and change it to fit any additional machines that you want to backup.
+
+For now, you want to change the configuration file just (as shown above), and save it. Copy that file as a template for our first server:
+
+`cp /etc/rsnapshot.conf /etc/rsnapshot_web.conf`
+
+You want to change the configuration file and create the log and lockfile with the machine's name:
+
+`logfile /var/log/rsnapshot_web.log`
+
+`lockfile        /var/run/rsnapshot_web.pid`
+
+Next, you want to change rsnapshot_web.conf so that it includes the directories you want to back up. The only thing that is different here is the target.
+
+Here is an example of the web.ourdomain.com configuration:
+
+```bash
+### BACKUP POINTS / SCRIPTS ###
+backup  root@web.ourourdomain.com:/etc/     web.ourourdomain.com/
+backup  root@web.ourourdomain.com:/var/www/     web.ourourdomain.com/
+backup  root@web.ourdomain.com:/usr/local/     web.ourdomain.com/
+backup  root@web.ourdomain.com:/home/     web.ourdomain.com/
+backup  root@web.ourdomain.com:/root/     web.ourdomain.com/
+```
+
+### Checking the configuration and running the initial backup
+
+You can now check the configuration to ensure it is syntactically correct:
+
+`rsnapshot -c /etc/rsnapshot_web.conf configtest`
+
+You are looking for the `Syntax OK` message. If all is well, you can run the backup manually:
+
+`/usr/bin/rsnapshot -c /etc/rsnapshot_web.conf beta`
+
+Assuming that everything works, you can create the configuration files for the mail server (rsnapshot_mail.conf) and portal server (rsnapshot_portal.conf), test them, and do a trial backup.
+
+## Automating the backup
+
+Automating backups for the multiple machine or server version is slightly different. You want to create a bash script to call the backups in order. When one finishes the next will start. This script will look similar to:
+
+`vi /usr/local/sbin/backup_all`
+
+With the content:
+
+```bash
+#!/bin/bash/
+# script to run rsnapshot backups in succession
+/usr/bin/rsnapshot -c /etc/rsnapshot_web.conf beta
+/usr/bin/rsnapshot -c /etc/rsnapshot_mail.conf beta
+/usr/bin/rsnapshot -c /etc/rsnapshot_portal.conf beta
+```
+
+Save the script to /usr/local/sbin and make the script executable:
+
+`chmod +x /usr/local/sbin/backup_all`
+
+Create the crontab for root to run the backup script:
+
+`crontab -e`
+
+Add this line:
+
+```bash
+## Running the backup at 11 PM
+00 23 *  *  *  /usr/local/sbin/backup_all
+```
+
+## Reporting the backup status
+
+To ensure that everything is backing up according to plan, you might want to send the backup log files to your email. If you are running multiple machine backups using _rsnapshot_, each log file will have its own name, which you can send to your email for review by [Using the postfix For Server Process Reporting](../email/postfix_reporting.md) procedure.
+
+## Restoring a backup
+
+Restoring a few files or an entire backup involves copying the files you want from the directory with the date that you want to restore from back to your machine.
+
+## Conclusions and other resources
+
+Getting the setup right with _rsnapshot_ is a little daunting at first, but can save you loads of time backing up your machines or servers.
+
+_rsnapshot_ is powerful, fast, and economical on disk space usage. You can find more on _rsnapshot_, by visiting [rsnapshot.org](https://rsnapshot.org/download.html).
 
 WIP
 
