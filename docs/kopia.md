@@ -143,7 +143,7 @@ NOTE: To validate that your provider is compatible with Kopia, please run:
 $ kopia repository validate-provider
 ```
 
-## Your initinal snapshot and incremental snapshots
+## Creating a snapshot
 
 Creating a snapshot is as simple as a `kopia snapshot create`:
 
@@ -159,8 +159,8 @@ Below is the output of the created snapshot:
 
 ???+ info "Information Layout"
 
-    _**{user}**@**{hostname}**:**/{directory}**_<br>
-    **{CREATIONDATE}** - **{{SNAPSHOT ID}}** - **{{SIZE}}** - **{{PERMISSIONS}}** - **{{RETENTION}}
+    _**{user}**@**{hostname}**:**/{directory_of_snapshot}**_<br>
+    **{CREATIONDATE}** - **{{SNAPSHOT ID}}** - **{{SIZE}}** - **{{PERMISSIONS}}** - **{{FILE_DIR_COUNT}}** - **{{RETENTION}}**
 
 ```bash title="output"
 [root@rockytest ~]# kopia snapshot ls
@@ -180,14 +180,27 @@ root@rockytest:/root
 2024-07-15 19:11:57 EDT k2e8cc246eeeef5d3f051e67fa513c7b0 28.7 MB dr-xr-x--- files:110 dirs:208 (latest-1,hourly-1,daily-1,weekly-1,monthly-1,annual-1)
 ```
 
+### Viewing Content
+
 Viewing the contents of the snapshot with `kopia list`:
 
+`-r` recursive output and `-l` long output to view other fields as date
+
 ```bash
-kopia list  k2e8cc246eeeef5d3f051e67fa513c7b0 -r -l
+kopia list  k2e8cc246eeeef5d3f051e67fa513c7b0 -r -l | sort -r | head
 ```
 
 ```bash title="output"
-drwxr-xr-x            0 2024-07-15 19:11:57 EDT kf652ba8cf935331461506477ecd8bf3a  folder/2/
+drwxr-xr-x            0 2024-07-26 23:42:29 UTC k2e8cc246eeeef5d3f051e67fa513c7b0  99/
+drwxr-xr-x            0 2024-07-26 23:42:29 UTC k2e8cc246eeeef5d3f051e67fa513c7b0  98/
+drwxr-xr-x            0 2024-07-26 23:42:29 UTC k2e8cc246eeeef5d3f051e67fa513c7b0  97/
+drwxr-xr-x            0 2024-07-26 23:42:29 UTC k2e8cc246eeeef5d3f051e67fa513c7b0  96/
+drwxr-xr-x            0 2024-07-26 23:42:29 UTC k2e8cc246eeeef5d3f051e67fa513c7b0  95/
+drwxr-xr-x            0 2024-07-26 23:42:29 UTC k2e8cc246eeeef5d3f051e67fa513c7b0  94/
+drwxr-xr-x            0 2024-07-26 23:42:29 UTC k2e8cc246eeeef5d3f051e67fa513c7b0  93/
+drwxr-xr-x            0 2024-07-26 23:42:29 UTC k2e8cc246eeeef5d3f051e67fa513c7b0  92/
+drwxr-xr-x            0 2024-07-26 23:42:29 UTC k2e8cc246eeeef5d3f051e67fa513c7b0  91/
+drwxr-xr-x            0 2024-07-26 23:42:29 UTC k2e8cc246eeeef5d3f051e67fa513c7b0  90/
 ```
 
 List a specific folder content and files by the object ID
@@ -212,7 +225,7 @@ First we'll carefully delete the contents of the directory we want to backup.
     Yes, this will delete your files, this is a loss in data.
     **BE CAREFUL**
 
-```bash title="Remove everything inside the directory /root/"
+```bash
 rm -rf /root/*
 ls /root/
 ```
@@ -221,8 +234,24 @@ ls /root/
 kopia restore root@rockytest:/root --snapshot-time latest
 ```
 
-```bash
-[root@rockytest ~]# kopia restore root@rockytest:/root --snapshot-time latest                                                             Restoring to local filesystem (/root) with parallelism=8...                                                                               Restoring from                                                                                                                               Snapshot source: root@rockytest:/root                                                                                                     Snapshot time: 2024-07-26 22:17:17 UTC                                                                                                    Relative path:                                                                                                                            Object ID: kcbee2a8626688104bcdc4cfcb95fa123                                                                                           Processed 1326 (1 GB) of 2635 (1.2 GB) 1 GB/s (82.1%) remaining 0s.                                                                       Processed 1872 (1.1 GB) of 2635 (1.2 GB) 543.9 MB/s (89.3%) remaining 0s.                                                                 Processed 2250 (1.2 GB) of 2635 (1.2 GB) 383.1 MB/s (94.6%) remaining 0s.                                                                 Processed 2571 (1.2 GB) of 2635 (1.2 GB) 298 MB/s (98.6%) remaining 0s.                                                                   Processed 2636 (1.2 GB) of 2635 (1.2 GB) 208.2 MB/s (100.0%) remaining 0s.                                                                Processed 2636 (1.2 GB) of 2635 (1.2 GB) 87.4 MB/s (100.0%) remaining 0s.                                                                 Processed 2636 (1.2 GB) of 2635 (1.2 GB) 87.4 MB/s (100.0%) remaining 0s.                                                                 Restored 2454 files, 180 directories and 2 symbolic links (1.2 GB).
+```bash title="Output"
+Restoring to local filesystem (/root) with parallelism=8...
+
+Restoring from:
+  Snapshot source: root@rockytest:/root
+  Snapshot time: 2024-07-26 22:17:17 UTC
+  Relative path:
+  Object ID: kcbee2a8626688104bcdc4cfcb95fa123
+
+Processed 1326 (1 GB) of 2635 (1.2 GB) 1 GB/s (82.1%) remaining 0s.
+Processed 1872 (1.1 GB) of 2635 (1.2 GB) 543.9 MB/s (89.3%) remaining 0s.
+Processed 2250 (1.2 GB) of 2635 (1.2 GB) 383.1 MB/s (94.6%) remaining 0s.
+Processed 2571 (1.2 GB) of 2635 (1.2 GB) 298 MB/s (98.6%) remaining 0s.
+Processed 2636 (1.2 GB) of 2635 (1.2 GB) 208.2 MB/s (100.0%) remaining 0s.
+Processed 2636 (1.2 GB) of 2635 (1.2 GB) 87.4 MB/s (100.0%) remaining 0s.
+Processed 2636 (1.2 GB) of 2635 (1.2 GB) 87.4 MB/s (100.0%) remaining 0s.
+
+Restored 2454 files, 180 directories, and 2 symbolic links (1.2 GB).
 ```
 
 ```bash title="Verify your backup are in place"
@@ -277,7 +306,7 @@ Unmount your repostitory by issuing the `fg` command and afterwards using ++ctrl
 fg
 ```
 
-## Configuring your repository policy
+## Configuring your policy
 
 Before diving into configuring your repository policies, you must first understand the policy settings and how they can be applied.
 
@@ -380,7 +409,7 @@ kopia policy set --add-ignore=*.7[zZ] --add-ignore=*.[gG][zZ] root@rockytest
 
 ???+ note
     Testing was mainly done with the following bash shell script.
-    
+
     ```bash
     for i in {1..10}; do kopia snapshot create $HOME && sleep 1; head -n1 /dev/random > $((i++)); done
     ```
@@ -394,7 +423,7 @@ kopia policy set --add-ignore=*.7[zZ] --add-ignore=*.[gG][zZ] root@rockytest
 --keep-annual=N    Number of most-recent annual backups to keep per source (or 'inherit')
 ```
 
-Let's start simple, we want to keep the last 10 snapshots of our backup as opposed to the inherited default from the global policy of 42.
+Let's start simple, we want to keep the lastest 5 snapshots of our backup as opposed to the inherited default from the global policy of 10.
 
 ```bash
 kopia policy set --keep-latest=10 root@rockytest
