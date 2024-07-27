@@ -186,7 +186,7 @@ Viewing the contents of the snapshot with `kopia list`:
 kopia list  k2e8cc246eeeef5d3f051e67fa513c7b0 -r -l
 ```
 
-```bash title=output
+```bash title="output"
 drwxr-xr-x            0 2024-07-15 19:11:57 EDT kf652ba8cf935331461506477ecd8bf3a  folder/2/
 ```
 
@@ -209,8 +209,8 @@ You can use `kopia mount` or `kopia restore` to restore from backup, additionall
 First we'll carefully delete the contents of the directory we want to backup.
 
 ???+ warning
-  Yes, this will delete your files, this is a loss in data.
-  **BE CAREFUL**
+    Yes, this will delete your files, this is a loss in data.
+    **BE CAREFUL**
 
 ```bash title="Remove everything inside the directory /root/"
 rm -rf /root/*
@@ -345,8 +345,7 @@ Logging details (0-none, 10-maximum):
 Applying a compression setting to a repository via a policy
 
 ??? note
-
-  To view a list of compression algorithms please see https://kopia.io/docs/advanced/compression/
+    To view a list of compression algorithms please see https://kopia.io/docs/advanced/compression/
 
 ```bash
 kopia policy set --compression zstd root@rockytest
@@ -380,17 +379,19 @@ kopia policy set --add-ignore=*.7[zZ] --add-ignore=*.[gG][zZ] root@rockytest
 ### Retention
 
 ???+ note
-
-  Testing was mainly done with the following bash shell script.
-  
-  ```bash
-  for i in {1..10}; do kopia snapshot create $HOME && sleep 1; head -n1 /dev/random > $((i++)); done
-  ```
+    Testing was mainly done with the following bash shell script.
+    
+    ```bash
+    for i in {1..10}; do kopia snapshot create $HOME && sleep 1; head -n1 /dev/random > $((i++)); done
+    ```
 
 ```bash title="Retention pollicies"
-  --keep-latest=N            Number of most recent backups to keep per source (or 'inherit')                                                --keep-hourly=N            Number of most-recent hourly backups to keep per source (or 'inherit')                                         --keep-daily=N             Number of most-recent daily backups to keep per source (or 'inherit')                                          --keep-weekly=N            Number of most-recent weekly backups to keep per source (or 'inherit')
-  --keep-monthly=N           Number of most-recent monthly backups to keep per source (or 'inherit')
-  --keep-annual=N            Number of most-recent annual backups to keep per source (or 'inherit')
+--keep-latest=N    Number of most recent backups to keep per source (or 'inherit')
+--keep-hourly=N    Number of most-recent hourly backups to keep per source (or 'inherit')
+--keep-daily=N     Number of most-recent daily backups to keep per source (or 'inherit')
+--keep-weekly=N    Number of most-recent weekly backups to keep per source (or 'inherit')
+--keep-monthly=N   Number of most-recent monthly backups to keep per source (or 'inherit')
+--keep-annual=N    Number of most-recent annual backups to keep per source (or 'inherit')
 ```
 
 Let's start simple, we want to keep the last 10 snapshots of our backup as opposed to the inherited default from the global policy of 42.
