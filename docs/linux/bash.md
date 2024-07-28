@@ -21,6 +21,11 @@ set -euo pipefail
 IFS=$'\n\t'
 ```
 
+```bash title="Debugging"
+# View all commands executed in sequence, very helpful for debugging!
+set -x
+```
+
 ## Bash Style Guide
 ----------
 
