@@ -23,32 +23,7 @@ native `NFSv4 ACLs`, and can be very precisely configured.
     * <https://en.wikipedia.org/wiki/ZFS>
 
 ---
-## Table of contents
-
-<!-- vim-markdown-toc GitLab -->
-
-* [Install](#install)
-* [Config](#config)
-* [Use](#use)
-    * [sanoid](#sanoid)
-    * [RAIDZ expansion](#raidz-expansion)
-
-<!-- vim-markdown-toc -->
-
----
-## Install
-
-TODO
-
----
-## Config
-
-TODO
-
----
-## Use
-
-TODO
+# Viewing Basics
 
 * Show disk space utilization info:
     ```console
@@ -92,3 +67,44 @@ TODO
     
     $ arc_summary
     ```
+
+---
+# Handle Drives and Pools
+
+ZFS Pools vdevs that can contain datasets, if a vdev fails the pool is considered failed.
+
+Each RAID-Z vdev can have single, double or triple parity (called raidz/raidz1, raidz2 and raidz3), implying that it can withstand one, two or three disks failing at the same time, so generally speaking you would use higher parity the more disks your vdev is comprised of.
+
+
+| Feature                | Stripe   | Mirror             | RAIDZ  | RAIDZ2 | RAIDZ3 | Stripe+Mirror                                  |
+|------------------------|----------|--------------------|--------|--------|--------|------------------------------------------------|
+| Min number of disks    | 1        | 2                  | 2      | 4      | 5      | 4                                              |
+| Fault tolerance        | None     | (N-1) disk          | 1 disk | 2 disks| 3 disks| (N-1) disk in each N-disk mirror               |
+| Disk space overhead    | None     | (N-1)/N            | 1 disk | 2 disks| 3 disks| (N-1)*P for P stripe over N-disk mirrors       |
+| Read speed             | Fast     | Fast               | Slow, see below | Fast   |        |                                                |
+| Write speed            | Fast     | Fair               | Slow, see below | Fair   |        |                                                |
+| Hardware cost          | Cheap    | High to highest    | High   | Very high | Very High (disks) | High to highest                                |
+
+* Craete a zfs pool
+
+```bash
+zfs create poolname raidlevel drives
+```
+
+* Attach a drive into a mirror pool
+
+```bash
+zpool attach poolname driveinpool newdrive
+```
+
+* Deatch a drive into a mirror pool
+
+```bash
+zpool detach poolname drive
+```
+
+* Replace a drive in a zfs pool
+
+```bash
+zpool replace poolname drive newdrive
+```
