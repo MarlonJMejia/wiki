@@ -45,6 +45,7 @@ vmstat -s # summary memory stats
 
 free -m
 grep -i oom /var/log/messages ( /var/log/syslog )
+dmesg -T | grep -i link
 
 # CPU:
 top
