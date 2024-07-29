@@ -1,9 +1,9 @@
-site_name: Documentation and Notes
+site_name: DOCS
 repo_url: https://github.com/MarlonJMejia/wiki
 
 theme:
   font: 
-    text: DM Sans
+    text: UI-Sans
     code: DM Mono
   name: material
   features:

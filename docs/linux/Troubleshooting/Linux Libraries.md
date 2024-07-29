@@ -46,13 +46,16 @@ Now, let’s move on from theory and dive into practice.
 
 `ldd` command shows what libraries an executable file depends on. Here’s the output of the `ldd` command for the `sleep` command:
 
+```bash
 $ ldd `which sleep`
         linux-vdso.so.1 (0x00007fffd6d23000)
         libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f3ad2400000)
         /lib64/ld-linux-x86-64.so.2 (0x00007f3ad2688000)
+```
 
-This output indicates the libraries that the sleep command depends on. It’s essential to note that `ldd` command may not always reveal dependencies, especially when dealing with interpreted languages like Python. For instance, consider the Python script provided below:
+This output indicates the libraries that the `sleep` command depends on. It’s essential to note that `ldd` command may not always reveal dependencies, especially when dealing with interpreted languages like Python. For instance, consider the Python script provided below:
 
+```bash
 #!/usr/bin/env python3
 import lzma
 import time
@@ -60,14 +63,18 @@ import time
 print(lzma.__name__)
 
 time.sleep(10)
+```
 
-If we attempt to run ldd directly on the source file, it won’t show anything, as demonstrated below:
+If we attempt to run `ldd` directly on the source file, it won’t show anything, as demonstrated below:
 
+```bash
 ldd ./main.py
         not a dynamic executable
+```
 
-This result is expected because Python is an interpreted language, and the script itself is not a compiled executable file. Instead, it is executed by the Python interpreter at runtime. Therefore, ldd won’t detect any dependencies when applied directly to Python source files. Let’s run the code and check what lsof shows us:
+This result is expected because Python is an interpreted language, and the script itself is not a compiled executable file. Instead, it is executed by the Python interpreter at runtime. Therefore, `ldd` won’t detect any dependencies when applied directly to Python source files. Let’s run the code and check what `lsof` shows us:
 
+```bash
 COMMAND    PID  USER   FD   TYPE DEVICE SIZE/OFF     NODE NAME
 python3 102408 myuser  cwd    DIR  252,1     4096  7046183 /home/myuser/main.py
 python3 102408 myuser  rtd    DIR  252,1     4096        2 /
@@ -84,30 +91,36 @@ python3 102408 myuser  mem    REG  252,1   240936 26740828 /usr/lib/x86_64-linux
 python3 102408 myuser    0u   CHR  136,0      0t0        3 /dev/pts/0
 python3 102408 myuser    1u   CHR  136,0      0t0        3 /dev/pts/0
 python3 102408 myuser    2u   CHR  136,0      0t0        3 /dev/pts/0
+```
 
 When we run the provided Python script and check the running process with lsof, we can see that many libraries are indeed loaded, including LZMA, which we have used in our Python code. In this case, the LZMA library seems to be written in CPython, and when we check its dependencies using ldd, we find that it relies on other libraries such as liblzma:
 
+```bash
 $ ldd /usr/lib/python3.10/lib-dynload/_lzma.cpython-310-x86_64-linux-gnu.so
         linux-vdso.so.1 (0x00007ffef99fd000)
         liblzma.so.5 => /lib/x86_64-linux-gnu/liblzma.so.5 (0x00007fd768603000)
         libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fd768200000)
         /lib64/ld-linux-x86-64.so.2 (0x00007fd768654000)
+```
 
 This demonstrates the intricate dependencies between system libraries, highlighting the importance of understanding and managing them properly. It’s important to be cautious with system libraries, as even small changes can have significant consequences.
 
-Now let’s go back to our sleep command. Here’s the output of the strace command for executing the sleep command with a limited set of system calls to monitor file accesses when we executing sleep. We are doing it to check what files are accessed when we run sleep command:
+Now let’s go back to our `sleep` command. Here’s the output of the strace command for executing the `sleep` command with a limited set of system calls to monitor file accesses when we executing `sleep`. We are doing it to check what files are accessed when we run `sleep` command:
 
+```bash
 $ strace -e openat,open,access -f sleep 5s
 access("/etc/ld.so.preload", R_OK)      = 0
 openat(AT_FDCWD, "/etc/ld.so.preload", O_RDONLY|O_CLOEXEC) = 3
 openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libc.so.6", O_RDONLY|O_CLOEXEC) = 3
 openat(AT_FDCWD, "/usr/lib/locale/locale-archive", O_RDONLY|O_CLOEXEC) = 3
+```
 
-This output confirms that the system is reading ld.so.preload and ld.so.cache, as mentioned earlier.
+This output confirms that the system is reading `ld.so.preload` and `ld.so.cache`, as mentioned earlier.
 
-Now, Let’s set LD_* variables and check strace again:
+Now, Let’s set `LD_*` variables and check `strace` again:
 
+```bash
 $ mkdir -pv /tmp/mylibs/dir{1,2}
 mkdir: created directory '/tmp/mylibs'
 mkdir: created directory '/tmp/mylibs/dir1'
@@ -143,11 +156,13 @@ openat(AT_FDCWD, "/tmp/mylibs/dir2/x86_64/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 E
 openat(AT_FDCWD, "/tmp/mylibs/dir2/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
 openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libc.so.6", O_RDONLY|O_CLOEXEC) = 3
+```
 
-As you can see, there’s considerably more activity when running sleep with the LD_* variables set. It checks for libraries in directories specified in LD_LIBRARY_PATH and also opens /lib/x86_64-linux-gnu/liblzma.so.5, which we set in LD_PRELOAD.
+As you can see, there’s considerably more activity when running `sleep` with the `LD_*` variables set. It checks for libraries in directories specified in `LD_LIBRARY_PATH` and also opens `/lib/x86_64-linux-gnu/liblzma.so.5`, which we set in `LD_PRELOAD`.
 
-By using lsof, we can validate that liblzma is being loaded for the sleep process. Here’s the output of the lsof command:
+By using `lsof`, we can validate that liblzma is being loaded for the sleep process. Here’s the output of the `lsof` command:
 
+```bash
 $ sleep infinity &
 
 $ lsof -p $(pgrep -f 'sleep infinity')
@@ -166,11 +181,18 @@ sleep   147063 myuser  mem    REG  252,1   240936 26740828 /usr/lib/x86_64-linux
 sleep   147063 myuser    0u   CHR  136,2      0t0        5 /dev/pts/2
 sleep   147063 myuser    1u   CHR  136,2      0t0        5 /dev/pts/2
 sleep   147063 myuser    2u   CHR  136,2      0t0        5 /dev/pts/2
+```
 
-As you can see, /usr/lib/x86_64-linux-gnu/liblzma.so.5.2.5 is indeed loaded into the memory for the sleep process which we did set in LD_PRELOAD variable.
+As you can see, `/usr/lib/x86_64-linux-gnu/liblzma.so.5.2.5` is indeed loaded into the memory for the `sleep` process which we did set in `LD_PRELOAD` variable.
 
 These tricks have various practical applications:
 
-    Developing: During development, you can utilize temporary paths to test new or updated libraries before integrating them into applications that depend on them, ensuring they work correctly.
-    Management: In cases where an application relies on a library version incompatible with the system’s default, you can override library paths for that specific application, allowing it to use alternative libraries.
-    Security: Unfortunately, these techniques can also be exploited for malicious purposes. Cyber attackers may hijack libraries to manipulate application behavior, potentially introducing backdoors or other security vulnerabilities.
+* **Developing**: During development, you can utilize temporary paths to test new or updated libraries before integrating them into applications that depend on them, ensuring they work correctly.
+* **Management**: In cases where an application relies on a library version incompatible with the system’s default, you can override library paths for that specific application, allowing it to use alternative libraries.
+* **Security**: Unfortunately, these techniques can also be exploited for malicious purposes. Cyber attackers may hijack libraries to manipulate application behavior, potentially introducing backdoors or other security vulnerabilities.
+
+# Conclusion
+
+In conclusion, libraries are essential building blocks in the toolkit of system administrators, SREs, and DevOps professionals. Understanding their nuances, dependencies, and loading mechanisms is key to optimizing system performance, ensuring reliability, and enhancing security.
+
+Although library management is not as common nowadays due to the increasing use of containers, it’s still vital to understand these concepts. At the OS level, you might need to troubleshoot, patch, or investigate, making this understanding essential
