@@ -679,6 +679,14 @@ WIP
 kopia snapshot delete --all-snapshots-for-source illegal@legal --delete
 ```
 
-```view modification time
+```view title="modification time"
 kopia snapshot -mtime
+```
+
+```view  title="Repository stats"
+kopia content stats
+```
+
+```view title="Per snapshot stats"
+kopia snapshot list --storage-stats
 ```
