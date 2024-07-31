@@ -22,7 +22,7 @@ ssh -R 0.0.0.0:8080:localhost:80 user@server
 
 This command will forward traffic from any IP (listening address 0.0.0.0) at port 8080 to your local machine on port 80. So someone could access server:8080 and see what is on your laptop on port 80.
 
-## Using a Systemd Service
+# Using a Systemd Service
 
 You can use a systemd service to auto start a remote port forwarding session, this can be useful to forward port 22 of your laptop to a server you own so you always have ssh access remotely.
 
