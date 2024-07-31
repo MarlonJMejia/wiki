@@ -410,8 +410,8 @@ kopia policy set --add-ignore=*.7[zZ] --add-ignore=*.[gG][zZ] root@rockytest
 ???+ note
     Testing was mainly done with the following bash shell script.
 
-    ```bash
-    for i in {1..10}; do kopia snapshot create $HOME && sleep 1; head -n1 /dev/random > $((i++)); done
+    ```bash title="Populating Kopia Snapshots"
+    for i in {1..10}; do kopia snapshot create $HOME && sleep 2; head -n1 /dev/random > $((i++)); done
     ```
 
 ```bash title="Retention pollicies"
