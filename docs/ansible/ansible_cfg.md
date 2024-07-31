@@ -37,7 +37,7 @@ ansible-config list
 ansible-config init --disabled > ansible.cfg
 ```
 
-!!! note "Output"
+??? note "Output"
 
     ```bash
         [defaults]
