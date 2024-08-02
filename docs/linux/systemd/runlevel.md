@@ -8,6 +8,7 @@
 ```bash
 systemctl get-default
 ```
+
 This command will output something like graphical.target or multi-user.target, which correspond to the traditional run levels. Here’s a quick reference:
 
 | Runlevel | Systemd Target      |
