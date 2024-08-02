@@ -41,6 +41,9 @@
   file:
     path: /mnt/mysql_backups
     state: directory
+    mode: 770
+    owner: root
+    group: root
 
 - name: Mount up device by label
   mount:
