@@ -2,7 +2,8 @@
 
 ???+ note
 
-    This can be overriden via grub2
+    This can be overriden via grub2 by appending
+    GRUB_CMDLINE_LINUX=`systemd.unit=multi-user.target`
 
 ```bash
 systemctl get-default
@@ -28,6 +29,7 @@ init 5
 ```
 
 * Current runlevel
+
 ```bash
 runlevel
 ```
