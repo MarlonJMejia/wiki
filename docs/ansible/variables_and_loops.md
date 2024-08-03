@@ -10,8 +10,6 @@ All default variables can be found under in the [Ansible Documentation](https://
 
     List of all the hosts that were targeted by the play
 
-```
-
 # Access individual hosts facts
 
 ```bash
