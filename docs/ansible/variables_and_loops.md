@@ -1,3 +1,6 @@
+# Variables
+
+All default variables can be found under in the [Ansible Documentation](https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html)
 # Access individual hosts facts
 
 ```bash
