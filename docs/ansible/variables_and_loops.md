@@ -9,6 +9,7 @@ All default variables can be found under in the [Ansible Documentation](https://
 * ansible_play_hosts_all
 
     List of all the hosts that were targeted by the play
+    ['10.0.0.1', '10.0.0.2', '10.0.0.2']
 
 ## Access individual hosts facts
 
