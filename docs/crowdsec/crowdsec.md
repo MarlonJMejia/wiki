@@ -48,10 +48,9 @@ tail -n 10 /var/log/caddy/access.log | cscli explain -f- --type caddy -v
 type: http
 name: discord
 log_level: info
-format: |
+format: >-
   {
-  "content": " {{range . -}} {{$alert := . -}} {{range .Decisions -}}  {{if $alert.Source.Cn -}} {{$alert.Source.Cn}}: [WhoIs {{.Value}}](https://www.whois.com/whois/{{.Value}}) \n Type: {{.Type}} \n Duration: {{.Duration}} \n Scenario: {{.Scenario}} on machine '{{$alert.MachineID}}'. [Shodan](https://www.shodan.io/host/{{.Value}}){{end}} {{if not $alert.Source.Cn -}} :pirate_flag: [whois {{.Value}}](https://www.whois.com/whois/{{.Value}})\n Type: {{.Type}} \n Duration: {{.Duration}} \n Scenario: {{.Scenario}} on machine '{{$alert.MachineID}}'. \n [View on Shodan](<https://www.shodan.io/host/{{.Value}}>){{end}} {{end -}} {{end -}}
-  "
+  "content": ">>>{{range . -}} {{$alert := . -}} {{range .Decisions -}}  {{if $alert.Source.Cn -}} {{$alert.Source.Cn}}: [whois {{.Value}}](https://www.whois.com/whois/{{.Value}}) \n Type: {{.Type}} \n Duration: {{.Duration}} \n Scenario: {{.Scenario}} on machine '{{$alert.MachineID}}'. [Shodan](https://www.shodan.io/host/{{.Value}}){{end}} {{if not $alert.Source.Cn -}} :pirate_flag: [whois {{.Value}}](https://www.whois.com/whois/{{.Value}})\n Type: {{.Type}} \n Duration: {{.Duration}} \n Scenario: {{.Scenario}} on machine '{{$alert.MachineID}}'. \n [View on Shodan](<https://www.shodan.io/host/{{.Value}}>){{end}} {{end -}} {{end -}}"
   }
 url: https://discord.com/api/webhooks/<webhook id>/<webhook token>
 #                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
