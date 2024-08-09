@@ -58,7 +58,7 @@ dmesg |tail
 last -a
 ```
 
-What type of system? 
+What type of system?
 
 ```bash
 dmidecode -s system-manufacturer
