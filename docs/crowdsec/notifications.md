@@ -1,6 +1,4 @@
-# Notifications
-
-## Configuation files
+# Configuration
 
 * linux
     /etc/crowdsec/notifcations
