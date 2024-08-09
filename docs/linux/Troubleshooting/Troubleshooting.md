@@ -2,7 +2,7 @@
 
 ## Usage | Load
 
-```
+```bash
 # System uptime, and load average in the past 1, 5, 15 minutes.
 uptime 
 
@@ -83,7 +83,7 @@ needrestart
 
 ### Logging
 
-```
+```bash
 journalctl
 journalctl -n 20 --no-pager -u nginx # last lines for a specific unit
 journalctl --since yesterday --until "1 hour ago" # takes 2022-12-24, 08:00 ...
@@ -91,7 +91,7 @@ journalctl -k # kernel messages, dmesg
 journalctl -p err # 0, 1, 2, 3 ...
 ```
 
-```
+```bash
 dmesg | tail
 tail /var/log/messages  ( /var/log/syslog /var/log/kern.log )
 ```
@@ -99,7 +99,7 @@ tail /var/log/messages  ( /var/log/syslog /var/log/kern.log )
 
 ### systemd
 
-```
+```bash
 systemctl # same as systemctl list-units
 systemctl cat <service> # shows location and contents of config file for <service>
 systemctl list-unit-files # lists if they are masked (won't start, use unmask option)
@@ -111,7 +111,7 @@ systemd-analyze # startup time, append 'blame' for breakdown
 
 ### Filesystems and volumes
 
-```
+```bash
 fdisk -l
 df -lT # -l local, -T type
 lsblk -f # filesystem
@@ -130,7 +130,7 @@ xfs_repair /dev/sda     # scan and fix
 
 ### Networking
 
-```
+```bash
 ss -s
 netstat -s
 netstat -i
