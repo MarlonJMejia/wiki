@@ -14,8 +14,9 @@ name: discord
 log_level: info
 format: |
   {
-    "content": "```\n{{range . -}}{{$alert := . -}}{{range .Decisions -}}- {{.Value}} will get **{{.Type}}** for the next '{{.Duration}}' for triggering '{{.Scenario}}'\n{{end -}}{{end -}}\n```"
-  }  
+  "content": " {{range . -}} {{$alert := . -}} {{range .Decisions -}}  {{if $alert.Source.Cn -}} {{$alert.Source.Cn}}: [WhoIs {{.Value}}](https://www.whois.com/whois/{{.Value}}) \n Type: {{.Type}} \n Duration: {{.Duration}} \n Scenario: {{.Scenario}} on machine '{{$alert.MachineID}}'. [Shodan](https://www.shodan.io/host/{{.Value}}){{end}} {{if not $alert.Source.Cn -}} :pirate_flag: [whois {{.Value}}](https://www.whois.com/whois/{{.Value}})\n Type: {{.Type}} \n Duration: {{.Duration}} \n Scenario: {{.Scenario}} on machine '{{$alert.MachineID}}'. \n [View on Shodan](<https://www.shodan.io/host/{{.Value}}>){{end}} {{end -}} {{end -}}
+  "
+  }
 url: https://discord.com/api/webhooks/<webhook id>/<webhook token>
 #                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #                                          Your ID+Token Here
