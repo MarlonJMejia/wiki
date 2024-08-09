@@ -14,13 +14,14 @@ sar -n DEV 1
 sar -n TCP,ETCP 1  
 top
 ```
+
 Some of these commands require the sysstat package installed. The metrics these commands expose will help you complete some of the [USE Method](http://www.brendangregg.com/usemethod.html): a methodology for locating performance bottlenecks. This involves checking utilization, saturation, and error metrics for all resources (CPUs, memory, disks, e.t.c.). Also pay attention to when you have checked and exonerated a resource, as by process of elimination this narrows the targets to study, and directs any follow on investigation.
 
 The following sections summarize these commands, with examples from a production system. For more information about these tools, see their man pages.
 
 # 1. uptime
 
-$ **uptime**   
+$ **uptime**
 23:51:26 up 21:31, 1 user, load average: 30.02, 26.43, 19.02
 
 This is a quick way to view the load averages, which indicate the number of tasks (processes) wanting to run. On Linux systems, these numbers include processes wanting to run on CPU, as well as processes blocked in uninterruptible I/O (usually disk I/O). This gives a high level idea of resource load (or demand), but can’t be properly understood without other tools. Worth a quick look only.
