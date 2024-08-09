@@ -1,5 +1,11 @@
 # Acquisitions
 
+By default when CrowdSec is installed it will attempt to detect the running services and acquire the appropriate log sources and Collections.
+
+```bash
+cscli metrics show acquisition
+```
+
 * Caddy
 
 ```yaml
