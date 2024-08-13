@@ -6,7 +6,7 @@ date: 2024-08-13
 time: 06:51
 ---
 
-# Practical Application
+# I/O Performance
 
 ## Benchmarking Block Device
 
@@ -51,5 +51,38 @@ for i in {1..5}; do echo "Testing Read Disk with file ${i}"; dd if="file${i}" of
 | OCI      | 48.3 MB/s  | 15s - 10GB                    | 53.14 MB/s | 5min - 100GB     |
 | Hellcat5 |            |                               |            |                  |
 
+---
+## Network Speed
 
-## Benchmarking Network Speed
+### Iperf3
+
+> [!warning]
+> User iperf3 v3.16 or higher for multiple threads support.
+
+*  Creating an iperf server to verify network throughput
+
+```bash
+iperf3 --server 0.0.0.0/0
+```
+
+* Connecting to the iperf server via another machine (client)
+
+```
+iperf3 --connect publicip --port 5201
+```
+
+#### Options
+
+* `-P` =  Number of streams. iperf3 will spawn off a separate thread for each test stream. Using multiple streams may result in higher throughput than a single stream.
+* `--bidir` = Test in both directions (normal and reverse), with both the client and server sending and receiving data simultaneously
+* `-i, --interval n` pause n seconds between periodic throughput reports; default is 1, use 0 to disable
+* `-t, --time n` time in seconds to transmit for (default 10 secs)
+
+```bash
+iperf3 --client host -p 5201 -P 4 --bidir -t 20
+```
+
+### ntttcp 
+
+> [!info]
+> Created by microsoft mainly for windows, but there is a version for linux.
