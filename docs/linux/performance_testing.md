@@ -65,7 +65,7 @@ iperf3 --server 0.0.0.0/0
 
 * Connecting to the iperf server via another machine (client)
 
-```
+```bash
 iperf3 --connect publicip --port 5201
 ```
 
