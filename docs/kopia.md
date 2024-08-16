@@ -700,7 +700,8 @@ kopia snapshot list --storage-stats
 
   󰅖  kopia maintenance run --full --safety=none                                                                                             Running full maintenance...                                                                                                               Looking for active contents...                                                                                                            ERROR error processing github: error verifying 7432918280fd0081ada4e1a7981597d7: error getting content info for 7432918280fd0081ada4e1a7981597d7: content not found                                                                                                                 ERROR error processing controls: error verifying deb6a2ddcc9723feec34f890e824b30f: error getting content info for deb6a2ddcc9723feec34f890e824b30f: content not found                                                                                                               ERROR error processing controls.pub: error verifying 06885b5e71bc5454b71fab91b5c48f55: error getting content info for 06885b5e71bc5454b71fab91b5c48f55: content not 
 
-First we preview what fix would do and than we can commit the changes
+* First we preview what `kopia snapshot fix invalid-files` would change
+* Than we can accept those changes with `--commit`
 
 ```bash
 kopia snapshot fix invalid-files
