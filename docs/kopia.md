@@ -310,15 +310,15 @@ fg
 
 Before diving into configuring your repository policies, you must first understand the policy settings and how they can be applied.
 
-Policy settings can be applied to the following targets:
+Policy settings can be applied to the following target:
 
 | Targets     | Example     |
 | ------------- | ------------- |
+| user@host:path | root@rockytest:/root |
 | user@host | root@rockytest |
 | @host | @rockytest |
-| user@host:path | root@rockytest:/root |
 | local path | /.kopia_backups |
-| --global | global configuration |
+| --global | global repository configuration |
 
 ```bash title="View policy for the root@rockytest"
 [root@rockytest ~]# kopia policy show root@rockytest
@@ -371,7 +371,9 @@ Logging details (0-none, 10-maximum):
   Entry cache miss:                     0   inherited from (global)
 ```
 
-Applying a compression setting to a repository via a policy
+As you can see from above our target `root@rockytest` has mainly inherited all policy settings from the global configuration.
+
+Applying a compression setting targeting root@rockytest
 
 ??? note
     To view a list of compression algorithms please see https://kopia.io/docs/advanced/compression/
@@ -388,7 +390,7 @@ Compression:
   Compress files of all sizes.
 ```
 
-Ignoring files and directories
+Ignoring files and directories targeting @rockytest
 
 ```bash
 kopia policy set --add-ignore public/ --add-ignore node_modules/ root@rockytest
@@ -401,8 +403,14 @@ Setting policy for root@rockytest:root@rockytest
  - adding "node_modules/" to "ignore rules".
 ```
 
-```bash title="Ignore policy for specific extensions"
-kopia policy set --add-ignore=*.7[zZ] --add-ignore=*.[gG][zZ] root@rockytest
+Ignore Specific extensions in the repository.
+
+!!! warning
+  Reminder that the global policy is usually inherited by other targets.
+  Meaning that if you have set a different setting for a policy it will not inherit from the global policy.
+
+```bash title="Ignore policy for specific extensions globally"
+kopia policy set --add-ignore=*.7[zZ] --add-ignore=*.[gG][zZ] --global
 ```
 
 ### Retention
@@ -410,8 +418,8 @@ kopia policy set --add-ignore=*.7[zZ] --add-ignore=*.[gG][zZ] root@rockytest
 ???+ note
     Testing was mainly done with the following bash shell script.
 
-    ```bash title="Populating Kopia Snapshots"
-    for i in {1..10}; do kopia snapshot create $HOME && sleep 2; head -n1 /dev/random > $((i++)); done
+    ```bash
+    for i in {1..10}; do kopia snapshot create $HOME && sleep 1; head -n1 /dev/random > $((i++)); done
     ```
 
 ```bash title="Retention pollicies"
@@ -426,8 +434,118 @@ kopia policy set --add-ignore=*.7[zZ] --add-ignore=*.[gG][zZ] root@rockytest
 Let's start simple, we want to keep the lastest 5 snapshots of our backup as opposed to the inherited default from the global policy of 10.
 
 ```bash
-kopia policy set --keep-latest=10 root@rockytest
+kopia policy set --keep-latest=5 root@rockytest
 ```
+
+Now we will keep 5 snapshots with latest tag, however you can still gather many more snapshots due to the default keep of hourly being 48. Let's remove the retention policy for hourly snapshots, globally.
+
+```bash
+kopia policy set --keep-hourly=0 --global
+```
+
+As you can see we now do not see any hourly snapshots, and only 5 snapshots have the latest tag.
+
+```bash title="output"
+  2024-07-19 08:28:47 UTC k8367fddb6c9e3a5c7552a3345e29fbc4 144.9 MB dr-xr-x--- files:2067 dirs:9 (weekly-4)
+  2024-07-26 23:56:18 UTC k73e608624369e55e5f7785007c7e392f 1.2 GB dr-xr-xr-x files:2539 dirs:281 (daily-7)
+  2024-07-27 03:38:53 UTC kf7b13431069bb7309459e27b46e9eb84 1.3 GB dr-xr-xr-x files:2597 dirs:182 (daily-6,weekly-3)
+  2024-07-29 23:13:45 UTC k03e89b3dccd1013087357ef3e25b7e1c 1.3 GB dr-xr-xr-x files:2711 dirs:187 (daily-5)
+  2024-07-30 17:13:57 UTC k498bdd76927920f163a063e86d27643c 1.3 GB dr-xr-xr-x files:2748 dirs:187 (daily-4)
+  2024-07-31 23:59:21 UTC kb2031c3061234c9ee2c1dfe8aa8c2903 1.3 GB dr-xr-xr-x files:2786 dirs:187 (daily-3,monthly-2)
+  2024-08-01 16:59:34 UTC k6db50075b79026a1b0708dd8b43fd094 1.3 GB dr-xr-xr-x files:2806 dirs:187 (latest-5)
+  2024-08-01 17:59:34 UTC ke927c4fced640973508a4d5bf9d3e4ca 1.3 GB dr-xr-xr-x files:2807 dirs:187 (latest-4)
+  2024-08-01 18:59:35 UTC k9fe8a76c7b592949ba120a77a289eee1 1.3 GB dr-xr-xr-x files:2808 dirs:187 (latest-3)
+  2024-08-01 19:59:36 UTC kff82aafd969329a6b234e33c2a457bd2 1.3 GB dr-xr-xr-x files:2809 dirs:187 (latest-2,daily-2,weekly-2)
+  2024-08-15 19:48:39 UTC k54a5d1acc233fb912b46606273b7461c 1.3 GB dr-xr-xr-x files:2870 dirs:189 (latest-1,daily-1,weekly-1,monthly-1,annual-1)
+```
+
+# Server
+
+We will now be going into using our repository as a server for other clients to connect to, this can be very useful in case we have many users that need to backup their data.
+
+First we will need to create an account for our user(s).
+
+```bash
+kopia server user add myuser@mytest
+```
+
+```bash title="List your users"
+kopia server users list
+```
+
+Start the `kopia server` in the background by appending `&`
+Note that for consequential runs you will need to remove `--tls-generate-cert`
+
+```bash
+KOPIA_PASSWORD="changeme" \
+KOPIA_SERVER_CONTROL_PASSWORD="changeme" \
+  kopia server start \
+    --tls-generate-cert \
+    --tls-cert-file ~/my.cert \
+    --tls-key-file ~/my.key \
+    --address 127.0.0.0.1:51515 \
+    --server-control-username control &
+```
+
+Connecting to the server from another client, we are using the override parameters to connect in this case.
+
+```bash
+kopia repo connect server --url=http://127.0.0.0.1:51515 --override-username=myuser --override-hostname=mytest
+```
+
+```bash title="Create a simple snapshot"
+kopia snapshot create /root/
+```
+
+From here on out the applications you can do with a server is mostly limitless, connect multiple tenants or users to your kopia server to backup their files.
+
+# Automating Backups
+
+There are multiple ways we can achieve automating the backups, you can use a simple crontab if you have `cron` installed.
+
+```shell
+crontab -e
+
+```
+
+Create a small script to create a backup, please verify that the variables match the settings for the created repository and folders that need to be backed up.
+
+```shell title="kopia_backup.sh"
+# initialize repository
+#   kopia repository create filesystem --path /.kopia_backups
+#   kopia repository connect filesystem --path /.kopia_backups
+#   ---Policy settings---
+#   sudo kopia policy set --global --compression=zstd-fastest --keep-annual=0 --keep-monthly=12 --keep-weekly=0 --keep-daily=14 --keep-hourly=0 --keep-latest=3
+
+# Variables
+REPOSITORY="/.kopia_backups"
+BACKUP_THIS="/root"
+export KOPIA_PASSWORD="yourpassword"
+
+# Additionally we do not have to specify the directories and can use
+# kopia snapshot create --all to backup every diretory we have backed up.
+
+if [ -d "${BACKUP_THIS}"]; then
+  # Back up process
+  kopia repository connect filesystem --path="${REPOSITORY}"
+  kopia snapshot create "${BACKUP_THIS}" --progress-update-interval 30s
+  # Run Maintenance
+  kopia maintenance run
+  # Disconnect
+  kopia repository disconnect
+else
+  echo "Folder to backup was not found"; exit 1
+fi
+```
+
+Create a crontab to run the script every hour for a backup of our directory.
+
+```shell
+0 */1 * * * kopia_backup.sh
+```
+
+The systemd way, create a script, service and timer file.
+
 
 In this case, _rsnapshot_ will run locally to back up a particular machine. In this example, we will break down the configuration file, and show you exactly what you need to change.
 
