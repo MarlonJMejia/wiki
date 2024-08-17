@@ -501,7 +501,7 @@ From here on out the applications you can do with a server is mostly limitless, 
 
 # Automating Backups
 
-There are multiple ways we can achieve automating the backups, you can use a simple crontab if you have `cron` installed.
+There are multiple ways we can achieve automating the backups, you can use a simple crontab if you have the package `cronie` installed.
 
 ```shell
 crontab -e
@@ -543,9 +543,6 @@ Create a crontab to run the script every hour for a backup of our directory.
 ```shell
 0 */1 * * * kopia_backup.sh
 ```
-
-The systemd way, create a script, service and timer file.
-
 
 In this case, _rsnapshot_ will run locally to back up a particular machine. In this example, we will break down the configuration file, and show you exactly what you need to change.
 
