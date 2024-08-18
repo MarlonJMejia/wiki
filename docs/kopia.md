@@ -515,7 +515,7 @@ Create a small script to create a backup, please verify that the variables match
 #   kopia repository create filesystem --path /.kopia_backups
 #   kopia repository connect filesystem --path /.kopia_backups
 #   ---Policy settings---
-#   sudo kopia policy set --global --compression=zstd-fastest --keep-annual=0 --keep-monthly=12 --keep-weekly=0 --keep-daily=14 --keep-hourly=0 --keep-latest=3
+#   sudo kopia policy set --global --compression=s2-default --keep-annual=1 --keep-monthly=1 --keep-weekly=0 --keep-daily=0 --keep-hourly=0 --keep-latest=20
 
 # Variables
 REPOSITORY="/.kopia_backups"

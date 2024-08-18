@@ -16,6 +16,7 @@ ssh-keygen -C mycomment -f /tmp/somekey -t ed25519
 
 Next, grab the public key (NOT THE PRIVATE KEY!) from `~/.ssh/id_ed25519.pub`.
 Public keys will always end with `.pub`.
+
 ```bash
 cat ~/.ssh/id_ed25519.pub
 ```
@@ -57,6 +58,12 @@ Verify users can only log in via public key authentication only
 
 ```bash
 ssh -o PubkeyAuthentication=no -o PreferredAuthentications=password proxmox.inside.lan
+```
+
+Verify correct key file type
+
+```bash
+ssh-keygen -lf privatekey
 ```
 
 Verify sshd configuration
